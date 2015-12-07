@@ -49,30 +49,4 @@ class Movie
   def get_stars
     stars.split(',').join(', ')
   end
-
-
-  def get_genre
-    genre.split(',').join(', ')
-  end
-
-
-  def format_release_date
-    delimiters = release_date.count('-')
-
-    date = case delimiters
-      when 2
-        Date.strptime(release_date, '%Y-%m-%d')
-      when 1
-        Date.strptime(release_date, '%Y-%m')
-      when 0
-        Date.strptime(release_date, '%Y')
-    end
-    
-    date.strftime('%m %B %Y')
-  end
-
-
-  def country?(country)
-    self.country == country
-  end
 end
