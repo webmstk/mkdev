@@ -1,17 +1,17 @@
 class MyMovieList < MovieList
-  attr_accessor :films_seen
+  attr_accessor :movies_seen
 
   def initialize(filename = 'movies.txt')
-    @films = read_file(filename)
+    @movies = read_file(filename)
   end
 
 
   def read_file filename
-    @films = []
+    @movies = []
 
     begin
-      @films = CSV.read(filename, col_sep: '|', headers: FIELDS).map do |line|
-        classify_film(line.to_hash)
+      @movies = CSV.read(filename, col_sep: '|', headers: FIELDS).map do |line|
+        classify_movie(line.to_hash)
       end
     rescue
       puts "File not found: #{filename}"
@@ -19,49 +19,49 @@ class MyMovieList < MovieList
   end
 
 
-  def classify_film film
-    case film[:year].to_i
+  def classify_movie movie
+    case movie[:year].to_i
       when 1900..1944
-        AncientMovie.new(self, film)
+        AncientMovie.new(self, movie)
       when 1945..1969
-        ClassicMovie.new(self, film)
+        ClassicMovie.new(self, movie)
       when 1968..1999
-        ModernMovie.new(self, film)
+        ModernMovie.new(self, movie)
       when 2000..Date::today.year
-        NewMovie.new(self, film)
+        NewMovie.new(self, movie)
       else
         raise 'error in parsing data'
     end
   end
 
 
-  def watch_films(films)
-    films.each { |film| watch_film(film[:name], film[:myrating]) }
+  def watch_movies(movies)
+    movies.each { |movie| watch_movie(movie[:name], movie[:myrating]) }
   end
 
 
-  def watch_film(name, myrating, date_seen = Date::today)
-    film = find_by_name(name)
+  def watch_movie(name, myrating, date_seen = Date::today)
+    movie = find_by_name(name)
 
-    film.myrating = myrating
-    film.date_seen = date_seen
+    movie.myrating = myrating
+    movie.date_seen = date_seen
   end
 
 
-  def recommend_films
-    @films
+  def recommend_movies
+    @movies
         .select(&:watched?)
-        .sort_by { |film| film.class::PREFERENCE * film.rating.to_f * rand }
+        .sort_by { |movie| movie.class::PREFERENCE * movie.rating.to_f * rand }
         .first(5)
   end
 
 
-  def recommend_films_seen
-    @films
+  def recommend_movies_seen
+    @movies
         .reject(&:watched?)
-        .sort_by do |film|
-      date_koef = film.date_seen.to_s.delete('-').to_i
-      film.class::PREFERENCE * film.myrating * rand / date_koef
+        .sort_by do |movie|
+      date_koef = movie.date_seen.to_s.delete('-').to_i
+      movie.class::PREFERENCE * movie.myrating * rand / date_koef
     end
         .first(5)
   end

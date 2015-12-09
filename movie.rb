@@ -10,6 +10,8 @@ class Movie
 
     @stars = @stars.split(',')
     @genre = @genre.split(',')
+    @year = @year.to_i
+    @rating = @rating.to_f
 
     @sort_date = case release_date.count('-')
                    when 2
@@ -34,7 +36,7 @@ class Movie
 
 
   def rating_to_stars
-    '*' * rating[-1].to_i
+    '*' * ((rating-8)*10).ceil
   end
 
 
@@ -42,11 +44,15 @@ class Movie
     country == c
   end
 
+  def title
+    name
+  end
 
   def description
     name
   end
 end
+
 
 class AncientMovie < Movie
   PREFERENCE = 20
@@ -56,16 +62,18 @@ class AncientMovie < Movie
   end
 end
 
+
 class ClassicMovie < Movie
   PREFERENCE = 40
 
   def description
-    director_films = @owner
+    director_movies = @owner
                          .by_director(director)
                          .map(&:name)
-    "#{name} - классика, режиссер #{director} (#{director_films.join(', ')})"
+    "#{name} - классика, режиссер #{director} (#{director_movies.join(', ')})"
   end
 end
+
 
 class ModernMovie < Movie
   PREFERENCE = 60
@@ -74,6 +82,7 @@ class ModernMovie < Movie
     "#{name} - современное кино (в ролях: #{stars.join('; ')})"
   end
 end
+
 
 class NewMovie < Movie
   PREFERENCE = 100
